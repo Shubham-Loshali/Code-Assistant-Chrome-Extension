@@ -2,6 +2,7 @@
 
 A Chrome extension that provides AI-powered code analysis, explanations, optimization suggestions, and debugging help using Google's Gemini Pro API.
 
+link - https://chromewebstore.google.com/detail/code-assistant-ai-code-he/nfifhhjfpkpmhpcfgdcckkcdanfbeaah
 ## Features
 
 ### Analysis Types
