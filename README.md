@@ -1,4 +1,4 @@
-# Code Assistant - AI Code Helper Extension
+# Code-Assistant-Chrome-Extension - AI Code Helper Extension
 
 A Chrome extension that provides AI-powered code analysis, explanations, optimization suggestions, and debugging help using Google's Gemini Pro API.
 
