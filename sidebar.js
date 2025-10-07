@@ -1,8 +1,4 @@
-/* sidebar.js
-Handles UI interactions, tab switching, copy/clear, loading state,
-listens for selection messages from parent page, calls Python API (placeholder),
-and persists results to chrome.storage to support cross-tab sync.
-*/
+
 
 const ctx = {
     inputText: null,
@@ -17,7 +13,7 @@ const ctx = {
 };
 
 (() => {
-    // DOM refs
+
     ctx.inputText = document.getElementById("inputText");
     ctx.tabs = Array.from(document.querySelectorAll(".tab"));
     ctx.panels = Array.from(document.querySelectorAll(".panel"));
@@ -28,7 +24,7 @@ const ctx = {
     ctx.statusText = document.getElementById("statusText");
     ctx.spinner = document.getElementById("spinner");
 
-    // Load pre-existing selection from storage on start
+
     chrome.storage.local.get(["selectedText"], (res) => {
         if (res?.selectedText) {
             ctx.inputText.value = res.selectedText;
@@ -36,7 +32,7 @@ const ctx = {
         }
     });
 
-    // Listen for storage updates (cross-tab)
+
     chrome.storage.onChanged.addListener((changes, area) => {
         if (area !== "local") return;
         if (changes.selectedText) {
@@ -46,18 +42,18 @@ const ctx = {
         }
     });
 
-    // Receive postMessage from page content script
+
     window.addEventListener("message", (ev) => {
         if (!ev.data || ev.data.type !== "selection") return;
         const text = ev.data.text || "";
         ctx.inputText.value = text;
         autoFillAllTabs(text);
         expandSidebar(); // request parent to expand
-        // also persist to storage
+
         chrome.storage.local.set({ selectedText: text, selectedAt: Date.now() });
     });
 
-    // tab switching
+
     ctx.tabs.forEach(t => {
         t.addEventListener("click", () => {
             ctx.tabs.forEach(tb => tb.classList.remove("active"));
@@ -69,7 +65,7 @@ const ctx = {
         });
     });
 
-    // copy/clear top toolbar
+
     ctx.clearBtn.addEventListener("click", () => {
         ctx.inputText.value = "";
         autoFillAllTabs("");
@@ -85,7 +81,7 @@ const ctx = {
         }
     });
 
-    // collapse behavior
+
     ctx.collapseBtn.addEventListener("click", () => {
         const root = document.getElementById("sidebar-root");
         if (root.classList.contains("collapsed")) {
@@ -97,7 +93,7 @@ const ctx = {
         }
     });
 
-    // per-panel copy/clear
+
     document.querySelectorAll(".copy-result").forEach((btn) => {
         btn.addEventListener("click", async (e) => {
             const panel = e.target.closest(".panel");
@@ -119,7 +115,7 @@ const ctx = {
         });
     });
 
-    // analyze button - calls example Python API
+
     ctx.analyzeBtn.addEventListener("click", async () => {
         const text = ctx.inputText.value.trim();
         if (!text) {
@@ -131,7 +127,7 @@ const ctx = {
         setStatus("Analyzing...");
 
         try {
-            // Example request: replace with your python API endpoint & API key
+
             const PYTHON_API_URL = "https://example.com/analyze"; // <-- change me
             const payload = {
                 text,
@@ -142,10 +138,10 @@ const ctx = {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // "Authorization": "Bearer YOUR_API_KEY" // if needed
+
                 },
                 body: JSON.stringify(payload),
-                // Add timeout handling manually as fetch has no native timeout
+
             });
 
             if (!resp.ok) {
@@ -155,10 +151,10 @@ const ctx = {
 
             const json = await resp.json();
 
-            // Expected shape example:
-            // { hints: "...", suggestions: "...", explanation: "...", clean: "...", solutions: "...", errors: "..." }
 
-            // populate panels safely (fallback to strings)
+
+
+
             setPanelText("hints", json.hints || json.hint || "No hints returned.");
             setPanelText("suggestions", json.suggestions || "No suggestions returned.");
             setPanelText("explanation", json.explanation || "No explanation returned.");
@@ -166,7 +162,7 @@ const ctx = {
             setPanelText("solutions", json.solutions || "No solutions returned.");
             setPanelText("errors", json.errors || "No error fixes returned.");
 
-            // persist results (optionally)
+
             chrome.storage.local.set({ lastAnalysis: { at: Date.now(), input: text, result: json } });
 
             setStatus("Done", 2000);
@@ -179,7 +175,7 @@ const ctx = {
 
     });
 
-    // Helper: auto fill summary fields, simple placeholder text
+
     function autoFillAllTabs(text) {
         const preview = text.length > 500 ? text.slice(0, 500) + "…" : text;
         const now = new Date().toLocaleString();
@@ -216,7 +212,7 @@ const ctx = {
         parent.postMessage({ source: "code-analyzer-iframe", type: "expand" }, "*");
     }
 
-    // expose for other pages/scripts to call (debug)
+
     window.__codeAnalyzer = {
         autoFillAllTabs,
         setPanelText

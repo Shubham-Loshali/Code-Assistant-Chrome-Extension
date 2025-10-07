@@ -1,8 +1,8 @@
-// Background script for Code Assistant Extension
 
-// Create context menu when extension is installed
+
+
 chrome.runtime.onInstalled.addListener(() => {
-    // Create context menu item
+
     chrome.contextMenus.create({
         id: 'analyzeCode',
         title: '🤖 Analyze Code',
@@ -10,14 +10,14 @@ chrome.runtime.onInstalled.addListener(() => {
     });
 });
 
-// Handle context menu clicks
+
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === 'analyzeCode') {
         handleAnalyzeCode(tab, info.selectionText);
     }
 });
 
-// Handle keyboard shortcut
+
 chrome.commands.onCommand.addListener((command) => {
     if (command === 'analyze-code') {
         handleAnalyzeCode();
@@ -27,12 +27,12 @@ chrome.commands.onCommand.addListener((command) => {
 async function handleAnalyzeCode(tab = null, selectedText = null, editorCodeIn = null) {
     try {
         if (!tab) {
-            // Get current active tab
+
             const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
             tab = activeTab;
         }
 
-        // Always try to gather both question and editor code (search all frames)
+
         let editorCode = editorCodeIn || null;
         try {
             const results = await chrome.scripting.executeScript({
@@ -82,7 +82,7 @@ async function handleAnalyzeCode(tab = null, selectedText = null, editorCodeIn =
             console.log('executeScript context fetch failed:', error);
         }
 
-        // Fallback to messaging if needed
+
         if (!selectedText || !editorCode) {
             try {
                 const response = await chrome.tabs.sendMessage(tab.id, { action: 'getLeetCodeContext' });
@@ -91,9 +91,9 @@ async function handleAnalyzeCode(tab = null, selectedText = null, editorCodeIn =
             } catch (_) {}
         }
 
-        // Open popup with selected text
+
         if (selectedText || editorCode) {
-            // Store selected text for popup to retrieve
+
             await chrome.storage.local.set({ 
                 selectedText: selectedText || '',
                 editorCode: editorCode || '',
@@ -101,7 +101,7 @@ async function handleAnalyzeCode(tab = null, selectedText = null, editorCodeIn =
             });
         }
 
-        // Open popup
+
         chrome.action.openPopup();
 
     } catch (error) {
@@ -109,7 +109,7 @@ async function handleAnalyzeCode(tab = null, selectedText = null, editorCodeIn =
     }
 }
 
-// Handle messages from content script
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'analyzeCode') {
         handleAnalyzeCode(sender.tab, request.selectedText, request.editorCode);
@@ -120,15 +120,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
-// Handle tab updates to inject content script if needed
+
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete' && tab.url) {
-        // Inject content script for all pages
+
         chrome.scripting.executeScript({
             target: { tabId: tabId },
             files: ['content.js']
         }).catch(() => {
-            // Ignore errors for pages where content script can't be injected
+
         });
     }
 });

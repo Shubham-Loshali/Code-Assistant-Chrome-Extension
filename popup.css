@@ -6,7 +6,7 @@
 
 body {
     width: 400px;
-    /* min-height: 500px; */
+    
     max-height: 600px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -16,8 +16,8 @@ body {
 
 .container {
     background: white;
-    /* border-radius: 12px; */
-    /* margin: 8px; */
+    
+    
     border: 1px solid #2d3748;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     overflow: hidden;
@@ -229,7 +229,7 @@ textarea:focus {
     transform: scale(1.05);
 }
 
-/* Code highlighting styles like ChatGPT */
+
 .code-container {
     background: #1e1e1e;
     border-radius: 8px;
@@ -288,7 +288,7 @@ textarea:focus {
     white-space: pre;
 }
 
-/* Simple clean code display */
+
 .code-block code {
     color: #d4d4d4;
     font-weight: 400;
@@ -376,7 +376,7 @@ textarea:focus {
     color: #6c757d;
 }
 
-/* Scrollbar styling */
+
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -395,7 +395,7 @@ textarea:focus {
     background: #a8a8a8;
 }
 
-/* Responsive design for smaller screens */
+
 @media (max-width: 450px) {
     body {
         width: 350px;
@@ -426,7 +426,7 @@ textarea:focus {
     }
 }
 
-/* Dark mode support */
+
 @media (prefers-color-scheme: dark) {
     .container {
         background: #2d3748;

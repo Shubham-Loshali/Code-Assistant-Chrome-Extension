@@ -1,6 +1,6 @@
-// Content script for Code Assistant Extension
 
-// Check if extension context is still valid
+
+
 function isExtensionContextValid() {
     try {
         return chrome.runtime && chrome.runtime.id;
@@ -9,7 +9,7 @@ function isExtensionContextValid() {
     }
 }
 
-// Listen for messages from popup and background script
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     try {
         if (request.action === 'getSelectedText') {
@@ -25,11 +25,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
     } catch (error) {
         console.log('Content script message error:', error);
-        // Don't send response if context is invalidated
+
     }
 });
 
-// Function to get currently selected text
+
 function getSelectedText() {
     const selection = window.getSelection();
     if (selection.rangeCount > 0) {
@@ -38,10 +38,10 @@ function getSelectedText() {
     return '';
 }
 
-// Try to extract code from common editors (LeetCode uses Monaco)
+
 function getEditorCode() {
     try {
-        // Monaco
+
         if (window.monaco && window.monaco.editor && typeof window.monaco.editor.getModels === 'function') {
             const models = window.monaco.editor.getModels();
             if (models && models.length > 0) {
@@ -52,7 +52,7 @@ function getEditorCode() {
     } catch (_) {}
 
     try {
-        // CodeMirror
+
         const cmEl = document.querySelector('.CodeMirror');
         if (cmEl && cmEl.CodeMirror && typeof cmEl.CodeMirror.getValue === 'function') {
             const value = cmEl.CodeMirror.getValue();
@@ -61,7 +61,7 @@ function getEditorCode() {
     } catch (_) {}
 
     try {
-        // Fallback: look for visible code textarea/contenteditable
+
         const ta = document.querySelector('textarea[aria-label="Code editor"], textarea');
         if (ta && ta.value && ta.value.trim()) return ta.value;
     } catch (_) {}
@@ -69,17 +69,17 @@ function getEditorCode() {
     return '';
 }
 
-// Add visual indicator when text is selected
+
 document.addEventListener('mouseup', () => {
     const selectedText = getSelectedText();
     if (selectedText && selectedText.length > 10) {
-        // Remove existing indicator
+
         const existingIndicator = document.getElementById('code-assistant-indicator');
         if (existingIndicator) {
             existingIndicator.remove();
         }
 
-        // Add new indicator
+
         const indicator = document.createElement('div');
         indicator.id = 'code-assistant-indicator';
         indicator.innerHTML = '🤖 Right-click to analyze code';
@@ -99,7 +99,7 @@ document.addEventListener('mouseup', () => {
             animation: slideIn 0.3s ease-out;
         `;
 
-        // Add animation keyframes
+
         if (!document.getElementById('code-assistant-styles')) {
             const style = document.createElement('style');
             style.id = 'code-assistant-styles';
@@ -118,7 +118,7 @@ document.addEventListener('mouseup', () => {
 
         document.body.appendChild(indicator);
 
-        // Auto-send selection to extension and open popup (no click needed)
+
         try {
             const editorCode = getEditorCode();
             chrome.runtime.sendMessage({ 
@@ -128,7 +128,7 @@ document.addEventListener('mouseup', () => {
             });
         } catch (_) {}
 
-        // Auto-hide after 1.5 seconds
+
         setTimeout(() => {
             if (indicator.parentNode) {
                 indicator.style.animation = 'slideOut 0.3s ease-in';
@@ -140,7 +140,7 @@ document.addEventListener('mouseup', () => {
             }
         }, 1500);
 
-        // Click to open popup (optional)
+
         indicator.addEventListener('click', () => {
             if (!isExtensionContextValid()) {
                 indicator.remove();
@@ -151,9 +151,9 @@ document.addEventListener('mouseup', () => {
     }
 });
 
-// Handle keyboard shortcut
+
 document.addEventListener('keydown', (event) => {
-    // Ctrl+Shift+Space
+
     if (event.ctrlKey && event.shiftKey && event.code === 'Space') {
         event.preventDefault();
         const selectedText = getSelectedText();
@@ -174,7 +174,7 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-// Detect code blocks and add analyze buttons
+
 function addCodeBlockButtons() {
     const codeBlocks = document.querySelectorAll('pre code, code, .highlight, .code-block');
     
@@ -199,13 +199,13 @@ function addCodeBlockButtons() {
             transition: opacity 0.3s ease;
         `;
 
-        // Make parent container relative positioned
+
         const parent = block.closest('pre') || block.parentElement;
         if (parent) {
             parent.style.position = 'relative';
             parent.appendChild(button);
             
-            // Show button on hover
+
             parent.addEventListener('mouseenter', () => {
                 button.style.opacity = '1';
             });
@@ -214,7 +214,7 @@ function addCodeBlockButtons() {
                 button.style.opacity = '0';
             });
             
-            // Handle button click
+
             button.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const codeText = block.textContent || block.innerText;
@@ -239,10 +239,10 @@ function addCodeBlockButtons() {
     });
 }
 
-// Add buttons to existing code blocks
+
 addCodeBlockButtons();
 
-// Watch for new code blocks being added
+
 const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
